@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Drum Kit</title>
+  <link rel="shortcut icon" href="#"/>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+  <div class="keys">
+    <div data-key="81" class="key">
+      <kbd>Q</kbd>
+      <span class="sound">clap</span>
+    </div>
+    <div data-key="83" class="key">
+      <kbd>S</kbd>
+      <span class="sound">hihat</span>
+    </div>
+    <div data-key="68" class="key">
+      <kbd>D</kbd>
+      <span class="sound">kick</span>
+    </div>
+    <div data-key="70" class="key">
+      <kbd>F</kbd>
+      <span class="sound">openhat</span>
+    </div>
+    <div data-key="71" class="key">
+      <kbd>G</kbd>
+      <span class="sound">boom</span>
+    </div>
+    <div data-key="72" class="key">
+      <kbd>H</kbd>
+      <span class="sound">ride</span>
+    </div>
+    <div data-key="74" class="key">
+      <kbd>J</kbd>
+      <span class="sound">snare</span>
+    </div>
+    <div data-key="75" class="key">
+      <kbd>K</kbd>
+      <span class="sound">tom</span>
+    </div>
+    <div data-key="76" class="key">
+      <kbd>L</kbd>
+      <span class="sound">tink</span>
+    </div>
+  </div>
+
+  <audio data-key="81" src="sounds/clap.wav"></audio>
+  <audio data-key="83" src="sounds/hihat.wav"></audio>
+  <audio data-key="68" src="sounds/kick.wav"></audio>
+  <audio data-key="70" src="sounds/openhat.wav"></audio>
+  <audio data-key="71" src="sounds/boom.wav"></audio>
+  <audio data-key="72" src="sounds/ride.wav"></audio>
+  <audio data-key="74" src="sounds/snare.wav"></audio>
+  <audio data-key="75" src="sounds/tom.wav"></audio>
+  <audio data-key="76" src="sounds/tink.wav"></audio>
+
+<script>
+
+  const removeTransition = (event) => {
+    if (event.propertyName !== 'transform') return;
+    event.currentTarget.classList.remove('playing');
+  }
+
+  const keySound = (event) => {
+    const audio = document.querySelector(`audio[data-key="${event.keyCode}"]`)
+    const key = document.querySelector(`.key[data-key="${event.keyCode}"]`)
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.play();
+    key.classList.add('playing');
+  }
+
+  const clickSound = (event) => {
+    event.preventDefault();
+    const keyCode = event.currentTarget.getAttribute('data-key');
+    const audio = document.querySelector(`audio[data-key="${keyCode}"]`);
+    audio.currentTime = 0;
+    audioPlay(`${audio.attributes.src.value}`)
+    event.currentTarget.classList.add('playing');
+  }
+
+  const audioPlay = async url => {
+    const context = new AudioContext();
+    const source = context.createBufferSource();
+    const audioBuffer = await fetch(url)
+      .then(res => res.arrayBuffer())
+      .then(ArrayBuffer => context.decodeAudioData(ArrayBuffer));
+    source.buffer = audioBuffer;
+    source.connect(context.destination);
+    source.start();
+  };
+
+  const keys = document.querySelectorAll('.key');
+
+  window.addEventListener('keydown', keySound)
+
+  keys.forEach((key) => {
+    key.addEventListener('click', clickSound);
+    key.addEventListener('touchstart', clickSound);
+    key.addEventListener('transitionend', removeTransition);
+  });
+
+  // (function () {
+
+  //   const URL = 'sounds/clap.wav';
+
+  //   const context = new AudioContext();
+  //   const playButton = document.querySelector('.key[data-key="80"]');
+
+  //   let yodelBuffer;
+
+  //   window.fetch(URL)
+  //     .then(response => response.arrayBuffer())
+  //     .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
+  //     .then(audioBuffer => {
+  //       yodelBuffer = audioBuffer;
+  //     });
+
+  //   playButton.onclick = () => play(yodelBuffer);
+
+  //   function play(audioBuffer) {
+  //     const source = context.createBufferSource();
+  //     source.buffer = audioBuffer;
+  //     source.connect(context.destination);
+  //     source.start();
+  //   }
+  // }());
+
+
+
+
+
+
+  // keyTest.addEventListener('click', event => {
+
+
+    // let audioContext;
+
+    // try {
+    //   audioContext =
+    //     new (window.AudioContext || window.webkitAudioContext)();
+    // } catch (error) {
+    //   window.alert(
+    //     `Sorry, but your browser doesn't support the Web Audio API!`
+    //   );
+    // }
+
+    // if (audioContext !== undefined) {
+    //   const oscillator = audioContext.createOscillator();
+    //   console.log(oscillator);
+    //   oscillator.connect(audioContext.destination);
+    //   oscillator.start();
+    //   oscillator.stop(audioContext.currentTime + 1);
+    // }
+  // });
+
+
+
+
+</script>
+
+
+</body>
+</html>
